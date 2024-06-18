@@ -1,0 +1,37 @@
+appId: com.electron.pike
+productName: Pike
+copyright: Copyright © 2024 Yuki_
+directories:
+  output: dist
+  buildResources: resources
+files:
+  - from: .
+    filter:
+      - package.json
+      - app
+publish: null
+
+mac:
+  target:
+    - dmg
+    - zip
+  category: public.app-category.developer-tools
+  hardenedRuntime: false
+  gatekeeperAssess: false
+  identity: null
+  type: distribution
+  icon: buildResources/favicon.icns
+
+win:
+  target:
+    - nsis
+    - zip
+  icon: buildResources/favicon.ico
+
+nsis:
+  oneClick: false
+  perMachine: true
+  allowElevation: true
+  allowToChangeInstallationDirectory: true
+  createDesktopShortcut: true
+  createStartMenuShortcut: true

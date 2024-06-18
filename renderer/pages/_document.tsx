@@ -1,0 +1,19 @@
+// _document.js
+import NextDocument, { Html, Head, Main, NextScript } from 'next/document'
+import { ColorModeScript } from '@chakra-ui/react'
+
+export default class Document extends NextDocument {
+  render() {
+    return (
+      <Html>
+        <Head />
+        <body>
+          {/* Make color mode persist across page loads */}
+          <ColorModeScript />
+          <Main />
+          <NextScript />
+        </body>
+      </Html>
+    )
+  }
+}

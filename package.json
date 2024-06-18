@@ -1,0 +1,58 @@
+{
+  "private": true,
+  "name": "Pike",
+  "description": "Pike Pike",
+  "version": "1.0.0",
+  "author": "Yuki <shiwenbin1617@gmail.com>",
+  "main": "app/background.js",
+  "scripts": {
+    "dev": "nextron",
+    "build": "nextron build",
+    "build:mac": "nextron build --mac --universal",
+    "build:win64": "nextron build --win --x64",
+    "build:win32": "nextron build --win --ia32",
+    "postinstall": "electron-builder install-app-deps"
+  },
+  "dependencies": {
+    "clipboardy": "^4.0.0",
+    "electron-serve": "^1.3.0",
+    "electron-store": "^8.2.0",
+    "iohook": "git+https://github.com/hiredigital/iohook.git#v0.9.4",
+    "node-abi": "3.24.0",
+    "node-addon-api": "^8.0.0",
+    "react-icons": "^5.2.1",
+    "wait-on": "^7.2.0"
+  },
+  "devDependencies": {
+    "@chakra-ui/icons": "^2.1.1",
+    "@chakra-ui/react": "^2.8.2",
+    "@chakra-ui/theme-tools": "^2.1.2",
+    "@emotion/react": "^11.11.4",
+    "@emotion/styled": "^11.11.5",
+    "@types/node": "^20.11.16",
+    "@types/react": "^18.2.52",
+    "@types/wait-on": "^5.3.4",
+    "electron": "11.0.0",
+    "electron-rebuild": "^3.2.9",
+    "framer-motion": "^11.2.10",
+    "next": "^13.5.6",
+    "nextron": "^8.15.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.3.1",
+    "typescript": "^5.4.5"
+  },
+  "iohook": {
+    "targets": [
+      "electron-85"
+    ],
+    "platforms": [
+      "win32",
+      "darwin"
+    ],
+    "arches": [
+      "x64",
+      "ia32",
+      "arm64"
+    ]
+  }
+}
