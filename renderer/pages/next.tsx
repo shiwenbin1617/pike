@@ -24,16 +24,6 @@ export default function NextPage() {
         />
         <Hero title={`⚡ Nextron ⚡`} />
         <Footer>
-          <Button
-            as={ChakraLink}
-            href="/home"
-            variant="outline"
-            colorScheme="teal"
-            rounded="button"
-            width="full"
-          >
-            Go to home page
-          </Button>
         </Footer>
       </Container>
     </React.Fragment>

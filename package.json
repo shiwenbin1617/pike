@@ -14,12 +14,14 @@
     "postinstall": "electron-builder install-app-deps"
   },
   "dependencies": {
+    "@hurdlegroup/robotjs": "^0.11.7",
+    "@types/electron": "^1.6.10",
     "clipboardy": "^4.0.0",
     "electron-serve": "^1.3.0",
     "electron-store": "^8.2.0",
-    "iohook": "git+https://github.com/hiredigital/iohook.git#v0.9.4",
     "node-abi": "3.24.0",
     "node-addon-api": "^8.0.0",
+    "node-global-key-listener": "^0.3.0",
     "react-icons": "^5.2.1",
     "wait-on": "^7.2.0"
   },
@@ -32,7 +34,7 @@
     "@types/node": "^20.11.16",
     "@types/react": "^18.2.52",
     "@types/wait-on": "^5.3.4",
-    "electron": "11.0.0",
+    "electron": "31.0.1",
     "electron-rebuild": "^3.2.9",
     "framer-motion": "^11.2.10",
     "next": "^13.5.6",
@@ -41,18 +43,9 @@
     "react-dom": "^18.3.1",
     "typescript": "^5.4.5"
   },
-  "iohook": {
-    "targets": [
-      "electron-85"
-    ],
-    "platforms": [
-      "win32",
-      "darwin"
-    ],
-    "arches": [
-      "x64",
-      "ia32",
-      "arm64"
-    ]
+  "overrides": {
+    "electron-rebuild": {
+      "node-abi": "3.24.0"
+    }
   }
 }
