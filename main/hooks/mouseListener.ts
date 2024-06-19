@@ -16,12 +16,26 @@ let isMouseDown = false;
 let clickCount = 0;
 let clickTimer: any;
 
+function debounce(func: Function, delay: number) {
+  let timerId: any;
+  return function(...args: any[]) {
+    if (timerId) {
+      clearTimeout(timerId);
+    }
+    timerId = setTimeout(() => {
+      func(...args);
+    }, delay);
+  };
+}
+
 function trackMouseEvents(
-    button: "MOUSE LEFT" | "MOUSE RIGHT",
-    onClick: (x: number, y: number, count: number) => void,
-    onDoubleClick?: (x: number, y: number, count: number) => Promise<void>,
-    onLeftDrag?: (startX: number, startY: number, endX: number, endY: number) => void
+  button: "MOUSE LEFT" | "MOUSE RIGHT",
+  onClick: (x: number, y: number, count: number) => void,
+  onDoubleClick?: (x: number, y: number, count: number) => Promise<void>,
+  onLeftDrag?: (startX: number, startY: number, endX: number, endY: number) => void
 ) {
+  const debouncedOnClick = debounce(onClick, CLICK_TIMEOUT);
+
   gkl.addListener((e: any) => {
     const x = e.location ? e.location[0] : undefined;
     const y = e.location ? e.location[1] : undefined;
@@ -47,16 +61,16 @@ function trackMouseEvents(
           if (clickCount === 1) {
             clickTimer = setTimeout(() => {
               if (clickCount === 1) {
-                onClick(x, y, clickCount); // 处理单击
+                debouncedOnClick(x, y, clickCount); // 处理单击，用防抖包装
+                clickCount = 0; // 重置计数
               }
-              clickCount = 0;
             }, CLICK_TIMEOUT);
           } else if (clickCount === 2 && onDoubleClick) {
             clearTimeout(clickTimer); // 清除单击定时器
             (async () => {
               await onDoubleClick(x, y, clickCount); // 处理双击
+              clickCount = 0; // 重置计数器
             })();
-            clickCount = 0; // 重置计数器
           }
         }
 

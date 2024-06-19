@@ -1,5 +1,5 @@
 import path from 'path';
-import { app, ipcMain, BrowserWindow } from 'electron';
+import {app, ipcMain, BrowserWindow, clipboard} from 'electron';
 import serve from 'electron-serve';
 import { createWindow } from './helpers';
 import { GlobalKeyboardListener, IGlobalKeyEvent } from 'node-global-key-listener';
@@ -117,7 +117,7 @@ const initializeMouseTracking = async () => {
       },
       async (x, y, count) => {
         console.log('Double clicked at:', x, y);
-        await new Promise(resolve => setTimeout(resolve, 300));
+        await new Promise(resolve => setTimeout(resolve, 10));
         const selectedContent = await getSelected();
         if (selectedContent.text === '') {
           console.log('No content selected');
@@ -127,7 +127,7 @@ const initializeMouseTracking = async () => {
       },
       async (x, y, count) => {
         console.log('Drag count ===', count, ' at:', x, y);
-        await new Promise(resolve => setTimeout(resolve, 300));
+        await new Promise(resolve => setTimeout(resolve, 10));
         const selectedContent = await getSelected();
         if (selectedContent.text === '') {
           console.log('No content selected');
@@ -138,7 +138,6 @@ const initializeMouseTracking = async () => {
   )
 }
 
-
 /**
  * Initialize the application
  */
@@ -147,6 +146,7 @@ const initializeApp = async () => {
     await app.whenReady();
     await createMainWindow();
     setupGlobalKeyListener();
+
     await initializeMouseTracking();
   } catch (error) {
     console.error('Failed to initialize the app:', error);
