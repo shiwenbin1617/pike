@@ -11,9 +11,7 @@ export const getSelected = async () => {
     const originalClipboard = {
         text: clipboard.readText(),
         fileUrl: clipboard.read('public.file-url' as any),
-        image: clipboard.readImage(),
-        rtf: clipboard.readRTF(),
-        html: clipboard.readHTML(),
+        image: clipboard.readImage()
     };
 
     // 清空剪贴板
@@ -23,9 +21,8 @@ export const getSelected = async () => {
     let newText = '';
     let newFileUrl = '';
 
-    // 标记为程序触发的复制操作并记录时间
+    // 标记为程序触发的复制操作
     isProgrammaticCopy = true;
-    const startTime = Date.now();
 
     const checkClipboard = () => {
         newText = clipboard.readText();
@@ -69,12 +66,6 @@ export const getSelected = async () => {
     }
     if (!originalClipboard.image.isEmpty()) {
         clipboard.writeImage(originalClipboard.image);
-    }
-    if (originalClipboard.rtf) {
-        clipboard.writeRTF(originalClipboard.rtf);
-    }
-    if (originalClipboard.html) {
-        clipboard.writeHTML(originalClipboard.html);
     }
 
     // 重置标志位
