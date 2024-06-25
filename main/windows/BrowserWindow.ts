@@ -59,19 +59,3 @@ module.exports = () => {
     getWindow,
   };
 };
-
-// // Usage example
-// app.on('ready', () => {
-//   const windowManager = require('./path/to/your/windowManagerModule')();
-//   const mainWindow = new BrowserWindow(/* your main window configs */);
-//   const panelWindow = windowManager.init(mainWindow);
-//
-//   // Do something with the panel window.
-//   console.log(panelWindow); // Should log the BrowserWindow instance.
-//
-//   // Example of toggling the window state
-//   setTimeout(() => {
-//     const toggledPanelWindow = windowManager.init(mainWindow);
-//     console.log(toggledPanelWindow); // Should log the toggled BrowserWindow instance.
-//   }, 5000); // Toggle the window state after 5 seconds
-// });

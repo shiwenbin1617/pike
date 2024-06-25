@@ -1,19 +1,23 @@
 import path from 'path';
-import {app, ipcMain, BrowserWindow, clipboard} from 'electron';
+import { app, ipcMain, BrowserWindow, globalShortcut, screen } from 'electron';
 import serve from 'electron-serve';
-import { createWindow } from './helpers';
-import { GlobalKeyboardListener, IGlobalKeyEvent } from 'node-global-key-listener';
 import sudo from 'sudo-prompt';
+
+// 导入自定义模块和函数
+import { createWindow } from './helpers';
 import { getSelected } from './hooks/useClipboard';
 import { trackLeftClick, trackRightClick } from './hooks/mouseListener';
 
-// Options for sudo-prompt
+// sudo-prompt 选项
 const options = {
   name: 'Electron App'
 };
 
+// 判断是否为生产环境
 const isProd = process.env.NODE_ENV === 'production';
 
+// 生产环境下使用静态资源
+// 开发环境下设置用户数据文件夹路径
 if (isProd) {
   serve({ directory: 'app' });
 } else {
@@ -21,17 +25,20 @@ if (isProd) {
 }
 
 let mainWindow: BrowserWindow | null = null;
+let framelessWindow: BrowserWindow | null = null;
 
 /**
- * Adjust permissions for MacKeyServer
+ * 为 MacKeyServer 设置权限
  */
 const setPermissionsForMacKeyServer = () => {
   return new Promise((resolve, reject) => {
-    sudo.exec('chmod +x "' + path.join(__dirname, '../node_modules/node-global-key-listener/bin/MacKeyServer') + '"', options, (error, stdout, stderr) => {
+    const command = `chmod +x "${path.join(__dirname, '../node_modules/node-global-key-listener/bin/MacKeyServer')}"`;
+
+    sudo.exec(command, options, (error, stdout, stderr) => {
       if (error) {
-        reject(new Error(`Failed to set permissions for MacKeyServer: ${stderr || error.message}`));
+        reject(new Error(`为 MacKeyServer 设置权限失败: ${stderr || error.message}`));
       } else {
-        console.log('Permissions set for MacKeyServer');
+        console.log('已为 MacKeyServer 设置权限');
         resolve(null);
       }
     });
@@ -39,7 +46,7 @@ const setPermissionsForMacKeyServer = () => {
 };
 
 /**
- * Create the main window
+ * 创建主窗口
  */
 const createMainWindow = async () => {
   mainWindow = createWindow('main', {
@@ -55,107 +62,113 @@ const createMainWindow = async () => {
   } else {
     const port = process.argv[2];
     await mainWindow.loadURL(`http://localhost:${port}/home`);
-    mainWindow.webContents.openDevTools();
+    mainWindow.webContents.openDevTools(); // 打开开发者工具
   }
 };
 
 /**
- * Set up global keyboard listener
+ * 切换无框窗口的显示状态
  */
-const setupGlobalKeyListener = () => {
-  const gkl = new GlobalKeyboardListener();
+const toggleFramelessWindow = async () => {
+  if (framelessWindow) {
+    framelessWindow.close();
+    framelessWindow = null;
+  } else {
+    framelessWindow = new BrowserWindow({
+      width: 800,
+      height: 300,
+      frame: false,
+      alwaysOnTop: true,
+      show: false, // 默认隐藏
+      webPreferences: {
+        preload: path.join(__dirname, 'preload.js'),
+      },
+    });
 
-  gkl.addListener((e, down) => {
-    if (
-      e.state === "DOWN" &&
-      e.name === "SPACE" &&
-      (down["LEFT META"] || down["RIGHT META"])
-    ) {
-      // Call your function here
-      return true;
-    }
-  });
+    framelessWindow.webContents.on('did-finish-load', () => {
+      console.log('Frameless window content loaded successfully');
+      framelessWindow!.show();
+      framelessWindow!.focus();
+    });
 
-  gkl.addListener((e, down) => {
-    if (
-      e.state === "DOWN" &&
-      e.name === "F" &&
-      (down["LEFT ALT"] || down["RIGHT ALT"])
-    ) {
-      // Call your function here
-      return true;
-    }
-  });
-
-  let isShiftPressed = false;
-
-  const shiftMListener = (e: IGlobalKeyEvent, down) => {
-    const { name } = e;
-
-    if (name === 'LEFT SHIFT' || name === 'RIGHT SHIFT') {
-      isShiftPressed = down;
-      return;
+    if (isProd) {
+      await framelessWindow.loadURL('app://./frameless');
+    } else {
+      const port = process.argv[2];
+      await framelessWindow.loadURL(`http://localhost:${port}/frame`);
     }
 
-    if (name === 'M' && isShiftPressed && down) {
-      console.log("使用了键盘" + name + "键");
-    }
-  };
+    // 中心位置调整
+    const { width, height } = screen.getPrimaryDisplay().workAreaSize;
 
-  gkl.addListener(shiftMListener);
+    framelessWindow.setBounds({
+      x: Math.round((width - 800) / 2),
+      y: Math.round((height - 300) / 2 - ((height - 300)) * 0.1),
+      width: 800,
+      height: 300,
+    });
+
+    framelessWindow.on('closed', () => {
+      framelessWindow = null;
+    });
+  }
 };
 
 /**
- * Initialize mouse tracking for left and right clicks
+ * 初始化鼠标跟踪功能
  */
 const initializeMouseTracking = async () => {
-
   trackLeftClick(
-      async (x, y, count) => {
-        // 按下鼠标时记录位置，并设置拖动状态
-        console.log('Mouse clicked at:', x, y);
-      },
-      async (x, y, count) => {
-        console.log('Double clicked at:', x, y);
-        await new Promise(resolve => setTimeout(resolve, 10));
-        const selectedContent = await getSelected();
-        if (selectedContent.text === '') {
-          console.log('No content selected');
-        } else {
-          console.log('Selected Content:', selectedContent);
-        }
-      },
-      async (x, y, count) => {
-        console.log('Drag count ===', count, ' at:', x, y);
-        await new Promise(resolve => setTimeout(resolve, 10));
-        const selectedContent = await getSelected();
-        if (selectedContent.text === '') {
-          console.log('No content selected');
-        } else {
-          console.log('Selected Content:', selectedContent);
-        }
+    async (x, y, count) => {
+      console.log('鼠标点击位置：', x, y);
+    },
+    async (x, y, count) => {
+      console.log('双击位置：', x, y);
+      await new Promise(resolve => setTimeout(resolve, 10));
+      const selectedContent = await getSelected();
+      if (selectedContent.text === '') {
+        console.log('没有选中内容');
+      } else {
+        console.log('选中内容：', selectedContent);
       }
+    },
+    async (x, y, count) => {
+      console.log('拖拽次数 ==', count, ' 位置：', x, y);
+      await new Promise(resolve => setTimeout(resolve, 10));
+      const selectedContent = await getSelected();
+      if (selectedContent.text === '') {
+        console.log('没有选中内容');
+      } else {
+        console.log('选中内容：', selectedContent);
+      }
+    }
   )
-}
+};
 
 /**
- * Initialize the application
+ * 初始化应用程序
  */
 const initializeApp = async () => {
   try {
     await app.whenReady();
     await createMainWindow();
-    setupGlobalKeyListener();
+    // await initializeMouseTracking();
 
-    await initializeMouseTracking();
+    // 注册全局快捷键监听
+    globalShortcut.register('CommandOrControl+M', () => {
+      console.log('CommandOrControl+M detected');
+      toggleFramelessWindow();
+    });
+
+    console.log('Global keyboard shortcut set up successfully.');
   } catch (error) {
-    console.error('Failed to initialize the app:', error);
+    console.error('初始化应用失败：', error);
     app.quit();
   }
 };
 
-// Main
-await (async () => {
+// 主入口
+(async () => {
   try {
     await setPermissionsForMacKeyServer();
     await initializeApp();
@@ -165,6 +178,9 @@ await (async () => {
   }
 })();
 
+/**
+ * 应用程序事件监听
+ */
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {
     app.quit();
@@ -172,11 +188,34 @@ app.on('window-all-closed', () => {
 });
 
 app.on('activate', async () => {
-  if (BrowserWindow.getAllWindows().length === 0) {
-    await createMainWindow();
+  try {
+    if (!mainWindow || mainWindow.isDestroyed()) {
+      await createMainWindow();
+    } else {
+      mainWindow.show();
+      mainWindow.focus();
+    }
+  } catch (error) {
+    console.error('Error during activate event:', error);
   }
 });
 
-ipcMain.on('message', async (event, arg) => {
-  event.reply('message', `${arg} World!`);
+app.on('will-quit', () => {
+  // 注销所有快捷键
+  globalShortcut.unregisterAll();
+});
+
+/**
+ * IPC 事件监听
+ */
+ipcMain.on('close-frameless-window', () => {
+  console.log('bg关闭无框窗口...');
+  if (framelessWindow) {
+    console.log('关闭无框窗口...');
+    framelessWindow.close();
+  }
+});
+
+ipcMain.on('open-main-window', (event, inputValue) => {
+  console.log('bg打开主窗口...', inputValue);
 });

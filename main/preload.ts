@@ -1,4 +1,4 @@
-import { contextBridge, ipcRenderer } from 'electron';
+const { ipcRenderer, contextBridge } = require('electron');
 
 /**
  * 创建事件处理程序函数
@@ -22,6 +22,7 @@ const createEventHandler = (eventName, callback) => {
 const handler = {
   send(channel, value) {
     try {
+      console.log(`Sending IPC message on channel ${channel}:`, value);
       ipcRenderer.send(channel, value);
     } catch (error) {
       console.error(`Error sending IPC message on channel ${channel}:`, error);
@@ -32,26 +33,9 @@ const handler = {
   },
   removeListener(channel, callback) {
     ipcRenderer.removeListener(channel, callback);
-  },
-  onTextSelected(callback) {
-    return createEventHandler('text-selected', callback);
-  },
-  sendTextSelection(rect) {
-    if (typeof rect === 'object' && rect !== null && 'x' in rect && 'y' in rect) {
-      ipcRenderer.send('text-selected', { rect });
-    } else {
-      console.error('Invalid rect object');
-    }
-  },
-  onShowToolbar(callback) {
-    return createEventHandler('show-toolbar', callback);
-  },
-  clipboard: {
-    readText: (type) => ipcRenderer.invoke('clipboard-read-text', type).catch(console.error),
-    writeText: (text) => ipcRenderer.invoke('clipboard-write-text', text).catch(console.error),
-    read: (format) => ipcRenderer.invoke('clipboard-read', format).catch(console.error)
   }
 };
 
 // 暴露处理接口到上下文隔离的渲染进程中
-contextBridge.exposeInMainWorld('electronAPI', handler);
+contextBridge.exposeInMainWorld('electron', handler);
+
