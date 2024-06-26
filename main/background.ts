@@ -100,10 +100,10 @@ const toggleFramelessWindow = async () => {
 
     // 中心位置调整
     const { width, height } = screen.getPrimaryDisplay().workAreaSize;
-
+    console.log('屏幕宽高：', width, height);
     framelessWindow.setBounds({
       x: Math.round((width - 800) / 2),
-      y: Math.round((height - 300) / 2 - ((height - 300)) * 0.1),
+      y: Math.round((height - 300) / 2 - ((height - 300)) * 0.15),
       width: 800,
       height: 300,
     });

@@ -1,8 +1,8 @@
 import { type NextRequest } from 'next/server'
 import { ChatClient } from 'dify-client'
 import { v4 } from 'uuid'
-import { API_KEY, API_URL, APP_ID } from '../../config'
-
+// import { API_KEY, API_URL, APP_ID } from '../../config'
+const APP_ID = '058f4d4f-d1da-44ee-90e8-90fbc101f710'
 const userPrefix = `user_${APP_ID}:`
 
 /**
@@ -29,4 +29,6 @@ export const setSession = (sessionId: string) => {
 }
 
 // 创建 ChatClient 实例
+const API_KEY = 'app-6AaUmgcmdP6ouy2y4pJmXhEv'
+const API_URL='http://192.168.0.222/v1'
 export const client = new ChatClient(API_KEY, API_URL || undefined)

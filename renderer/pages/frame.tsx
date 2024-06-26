@@ -75,21 +75,33 @@ const Frameless = () => {
             placeholder="请输入内容"
             px={4}
             py={6}
-            borderRadius="md"
-            background="white" // 突出输入框
-            boxShadow="md" // 添加阴影效果
-            color="black" // 黑色字体
+            borderRadius="0.375rem 0 0 0.375rem" // 调整圆角
+            background="white"
+            boxShadow="md"
+            color="black"
+            // borderRight="none" // 移除右侧边框
+            _focus={{
+              zIndex: 1,
+              borderColor: 'blue.300',
+              boxShadow: '0 0 0 1px blue.300'
+            }}
           />
-          <InputRightElement width="4.5rem">
+           <InputRightElement>
             <IconButton
               icon={<FaPaperPlane />}
               size="lg"
               onClick={handleSend}
               aria-label="发送"
-              bg="#00BFFF" // 按钮颜色
-              color="white"
-              transition="all 0.2s ease-in-out" // 添加过渡动画
-              _hover={{ transform: 'scale(1.1)' }} // 悬停缩放效果
+              bg="transparent"
+              color="black"
+              transition="all 0.2s ease-in-out"
+              _hover={{ transform: "scale(1.1)" }}
+              borderTopLeftRadius={0}
+              borderBottomLeftRadius={0}
+              borderLeft="none"
+              _focus={{ boxShadow: "none" }}
+              ml="-1px"
+              height="100%"
             />
           </InputRightElement>
         </InputGroup>
@@ -113,8 +125,8 @@ const Frameless = () => {
           width="100%"
           leftIcon={<FaLanguage />}
           justifyContent="left"
-          bg="#00BFFF" // 按钮颜色
-          color="white"
+          bg="#E1FFFF" // 按钮颜色
+          color="black"
           boxShadow="sm"
           transition="all 0.2s ease-in-out"
           _hover={{ boxShadow: 'md', transform: 'translateY(-3px)' }} // 悬停效果
@@ -127,8 +139,8 @@ const Frameless = () => {
           width="100%"
           leftIcon={<FaSearch />}
           justifyContent="left"
-          bg="#00BFFF" // 按钮颜色
-          color="white"
+          bg="#E1FFFF" // 按钮颜色
+          color="black"
           boxShadow="sm"
           transition="all 0.2s ease-in-out"
           _hover={{ boxShadow: 'md', transform: 'translateY(-3px)' }} //悬停效果
@@ -140,8 +152,8 @@ const Frameless = () => {
           width="100%"
           leftIcon={<FaCloudSun />}
           justifyContent="left"
-          bg="#00BFFF" // 按钮颜色
-          color="white"
+          bg="#E1FFFF" // 按钮颜色
+          color="black"
           boxShadow="sm"
           transition="all 0.2s ease-in-out"
           _hover={{ boxShadow: 'md', transform: 'translateY(-3px)' }} // 悬停效果
